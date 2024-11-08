@@ -168,9 +168,7 @@ const Markdown: FunctionComponent<Props> = ({
         // eslint-disable-next-line react/no-children-prop
         children={source2}
         remarkPlugins={[remarkGfm, remarkMathPlugin]}
-        rehypePlugins={[
-          rehypeRaw, rehypeMathJaxSvg /*, rehypeKatexPlugin*/,
-        ]}
+        rehypePlugins={[rehypeRaw, rehypeMathJaxSvg /*, rehypeKatexPlugin*/]}
         components={components}
         linkTarget="_blank"
       />

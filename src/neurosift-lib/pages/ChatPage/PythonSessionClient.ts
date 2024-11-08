@@ -62,8 +62,7 @@ class PythonSessionClient {
         );
       }
       kernel = this.jupyterConnectivityState.extensionKernel;
-    }
-    else {
+    } else {
       throw Error("Unexpected mode:" + this.jupyterConnectivityState.mode);
     }
 
@@ -141,11 +140,12 @@ class PythonSessionClient {
             "Unexpected python session status:" + this.#pythonSessionStatus,
           );
         }
-      } else if (this.jupyterConnectivityState.mode === "jupyterlab-extension") {
+      } else if (
+        this.jupyterConnectivityState.mode === "jupyterlab-extension"
+      ) {
         this.#pythonSessionStatus = "idle";
         this.#kernel = kernel;
-      }
-      else {
+      } else {
         throw Error("Unexpected mode:" + this.jupyterConnectivityState.mode);
       }
     } catch (err: any) {
@@ -167,12 +167,10 @@ class PythonSessionClient {
     if (this.jupyterConnectivityState.mode === "jupyter-server") {
       if (this.#kernelManager) {
         await this.#kernelManager.shutdownAll();
-      }
-      else if (this.#kernel) {
+      } else if (this.#kernel) {
         await this.#kernel.shutdown();
       }
-    }
-    else {
+    } else {
       // disconnect the slots
       if (this.#kernel) {
         if (this.#onStatusChangedSlot) {
