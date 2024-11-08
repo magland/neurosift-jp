@@ -40,7 +40,7 @@ class PythonSessionClient {
   async initiate() {
     let kernelManager: KernelManager | undefined;
     let kernel: Kernel.IKernelConnection;
-    if (this.jupyterConnectivityState.mode === "jupyterlab-extension") {
+    if (this.jupyterConnectivityState.mode === "jupyter-server") {
       if (!this.jupyterConnectivityState.jupyterServerIsAvailable) {
         throw Error("Jupyter server is not available");
       }
@@ -55,7 +55,7 @@ class PythonSessionClient {
       kernel = await kernelManager.startNew({
         name: "python",
       });
-    } else {
+    } else if (this.jupyterConnectivityState.mode === "jupyterlab-extension") {
       if (!this.jupyterConnectivityState.extensionKernel) {
         throw Error(
           "extensionKernel is not available even though the mode is jupyter-server",
@@ -63,8 +63,12 @@ class PythonSessionClient {
       }
       kernel = this.jupyterConnectivityState.extensionKernel;
     }
+    else {
+      throw Error("Unexpected mode:" + this.jupyterConnectivityState.mode);
+    }
 
     const onStatusChanged = (_: any, status: any) => {
+      console.info("status", status);
       if (status === "idle") {
         this._setPythonSessionStatus("idle");
       } else if (status === "busy") {
@@ -119,22 +123,30 @@ class PythonSessionClient {
     kernel.iopubMessage.connect(onIopubMessage);
 
     try {
-      // wait until we get our first status change
-      while (this.#pythonSessionStatus === "uninitiated") {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-      // wait until not busy
-      while (this.#pythonSessionStatus === "busy") {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-      if (this.#pythonSessionStatus === "unavailable") {
-        throw Error("Python session unavailable");
-      } else if (this.#pythonSessionStatus === "idle") {
+      if (this.jupyterConnectivityState.mode === "jupyter-server") {
+        // wait until we get our first status change
+        while (this.#pythonSessionStatus === "uninitiated") {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+        // wait until not busy
+        while (this.#pythonSessionStatus === "busy") {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+        if (this.#pythonSessionStatus === "unavailable") {
+          throw Error("Python session unavailable");
+        } else if (this.#pythonSessionStatus === "idle") {
+          this.#kernel = kernel;
+        } else {
+          throw Error(
+            "Unexpected python session status:" + this.#pythonSessionStatus,
+          );
+        }
+      } else if (this.jupyterConnectivityState.mode === "jupyterlab-extension") {
+        this.#pythonSessionStatus = "idle";
         this.#kernel = kernel;
-      } else {
-        throw Error(
-          "Unexpected python session status:" + this.#pythonSessionStatus,
-        );
+      }
+      else {
+        throw Error("Unexpected mode:" + this.jupyterConnectivityState.mode);
       }
     } catch (err: any) {
       kernel.statusChanged.disconnect(onStatusChanged);
