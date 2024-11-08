@@ -80,7 +80,10 @@ const plugin: JupyterFrontEndPlugin<void> = {
       name: FACTORY,
       modelName: 'nschat-model',
       fileTypes: ['nschat'],
-      defaultFor: ['nschat']
+      defaultFor: ['nschat'],
+      autoStartDefault: false,
+      preferKernel: false,
+      canStartKernel: true
     });
 
     // Add the widget to the tracker when it's created

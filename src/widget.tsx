@@ -49,8 +49,9 @@ NSChatDocModel
  * Widget that contains the main view of the DocumentWidget.
  */
 export class NSChatPanel extends ReactWidget {
-    width = 500;
-    height = 500;
+  width = 500;
+  height = 500;
+  kernel: any | undefined;
   /**
    * Construct a `NSChatPanel`.
    *
@@ -69,6 +70,11 @@ export class NSChatPanel extends ReactWidget {
 
       this._onContentChanged();
 
+      context.sessionContext.startKernel().then((ask) => {
+        this.kernel = context.sessionContext.session?.kernel;
+        this.update();
+      });
+
       this.update();
     });
 
@@ -79,7 +85,7 @@ export class NSChatPanel extends ReactWidget {
   render(): JSX.Element {
     return (
         <NeurosiftChatWidget
-            jupyterKernel={undefined}
+            jupyterKernel={this.kernel}
             width={this.width}
             height={this.height}
             onChatChanged={(chat: { messages: any[] }) => {

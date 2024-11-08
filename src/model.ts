@@ -29,7 +29,6 @@ export class NSChatDocModel implements DocumentRegistry.IModel {
    * @param options The options used to create a document model.
    */
   constructor(options: DocumentRegistry.IModelOptions<NSChatDoc>) {
-    console.log('--- NSChatDocModel')
     const { collaborationEnabled, sharedModel } = options;
     this._collaborationEnabled = !!collaborationEnabled;
     if (sharedModel) {
@@ -56,7 +55,7 @@ export class NSChatDocModel implements DocumentRegistry.IModel {
    * #### Notes
    * Only used if a document has associated kernel.
    */
-  readonly defaultKernelName = '';
+  readonly defaultKernelName = 'nschat-kernel';
 
   /**
    * The default kernel language of the document.
@@ -64,7 +63,7 @@ export class NSChatDocModel implements DocumentRegistry.IModel {
    * #### Notes
    * Only used if a document has associated kernel.
    */
-  readonly defaultKernelLanguage = '';
+  readonly defaultKernelLanguage = 'python';
 
   /**
    * The dirty state of the document.
