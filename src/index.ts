@@ -28,18 +28,25 @@ const plugin: JupyterFrontEndPlugin<void> = {
       label: 'Open Neurosift Chat',
       execute: () => {
         const current = tracker.currentWidget;
-        if (current) {
-          const kernel = current.sessionContext.session?.kernel;
-          if (kernel) {
-            const future = kernel.requestExecute({
-              code: 'print("Hello, Neurosift!")'
-            });
-            future.onIOPub = msg => {
-              console.log('--- msg', msg);
-            };
-          }
+        if (!current) {
+          console.error('neurosift-jp: No active notebook');
+          return;
         }
-        const content = new NeurosiftChatWidgetContainer();
+        const kernel = current.sessionContext.session?.kernel;
+        if (!kernel) {
+          console.error('neurosift-jp: No kernel');
+          return;
+        }
+        const testKernel = () => {
+          const future = kernel.requestExecute({
+            code: 'print("Kernel connection test successful!")'
+          });
+          future.onIOPub = msg => {
+            console.log(`neurosift-jp: Kernel test: ${msg}`);
+          };
+        }
+        testKernel();
+        const content = new NeurosiftChatWidgetContainer(kernel);
         const widget = new MainAreaWidget({ content });
         widget.title.label = 'Neurosift';
         app.shell.add(widget, 'main');
@@ -48,7 +55,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
     if (palette) {
       palette.addItem({
         command,
-        category: 'Tutorial'
+        category: 'Other'
       });
     }
   }
