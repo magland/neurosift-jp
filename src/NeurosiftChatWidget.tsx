@@ -1,6 +1,6 @@
 import { ReactWidget } from "@jupyterlab/apputils";
 import { Widget } from "@lumino/widgets";
-import { useReducer } from "react";
+import { useEffect, useReducer } from "react";
 import { Route, RouteContext } from "./neurosift-lib/contexts/useRoute";
 import { chatReducer, emptyChat } from "./neurosift-lib/pages/ChatPage/Chat";
 import { ChatContext } from "./neurosift-lib/pages/ChatPage/ChatContext";
@@ -38,12 +38,32 @@ const setRoute = (route: Route) => {
   //
 };
 
-const NeurosiftChatWidget: React.FC<{ jupyterKernel: any, width: number, height: number }> = ({
+export const NeurosiftChatWidget: React.FC<{
+  jupyterKernel: any,
+  width: number,
+  height: number,
+  onChatChanged?: (chat: { messages: any[] }) => void,
+  initialChat?: { messages: any[] },
+}> = ({
   jupyterKernel,
   width,
   height,
+  onChatChanged,
+  initialChat
 }) => {
   const [chat, chatDispatch] = useReducer(chatReducer, emptyChat);
+
+  useEffect(() => {
+    if (onChatChanged) {
+      onChatChanged(chat);
+    }
+  }, [chat, onChatChanged]);
+
+  useEffect(() => {
+    if (initialChat) {
+      chatDispatch({ type: "set", chat: initialChat });
+    }
+  }, [initialChat]);
 
   return (
     <RouteContext.Provider value={{route, setRoute}}>
