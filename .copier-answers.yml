@@ -1,0 +1,14 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v4.3.5
+_src_path: https://github.com/jupyterlab/extension-template
+author_email: jmagland@flatironinstitute.org
+author_name: Jeremy Magland
+has_binder: false
+has_settings: false
+kind: frontend
+labextension_name: neurosift-jp
+project_short_description: Neurosift Jupyter extension
+python_name: neurosift_jp
+repository: https://github.com/magland/neurosift-jp
+test: false
+
