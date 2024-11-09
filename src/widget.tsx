@@ -24,6 +24,7 @@ import { NSChatDocModel } from './model';
 import { NeurosiftChatWidget } from './NeurosiftChatWidget';
 
 import { ReactWidget } from "@jupyterlab/apputils";
+import { ChatAction, chatReducer, emptyChat } from './neurosift-lib/pages/ChatPage/Chat';
 
 /**
  * DocumentWidget: widget that represents the view or editor for a file type.
@@ -52,6 +53,7 @@ export class NSChatPanel extends ReactWidget {
   width = 500;
   height = 500;
   kernel: any | undefined;
+  chatDispatch: (action: ChatAction) => void;
   /**
    * Construct a `NSChatPanel`.
    *
@@ -70,13 +72,21 @@ export class NSChatPanel extends ReactWidget {
 
       this._onContentChanged();
 
-      context.sessionContext.startKernel().then((ask) => {
+      context.sessionContext.initialize().then((ask) => {
         this.kernel = context.sessionContext.session?.kernel;
         this.update();
       });
 
       this.update();
     });
+
+    this.chatDispatch = (action: ChatAction) => {
+      const newChat = chatReducer(this._model.chat || emptyChat, action);
+      if (this._model.chat !== newChat) {
+        this._model.chat = newChat;
+        this.update();
+      }
+    }
 
     this._onContentChanged();
     // this.node.appendChild(this._cube);
@@ -89,9 +99,12 @@ export class NSChatPanel extends ReactWidget {
             width={this.width}
             height={this.height}
             onChatChanged={(chat: { messages: any[] }) => {
+              if (this._model.chat !== chat) {
                 this._model.chat = chat;
+              }
             }}
-            initialChat={this._model.chat}
+            chat={this._model.chat || emptyChat}
+            chatDispatch={this.chatDispatch}
         />
     );
   }

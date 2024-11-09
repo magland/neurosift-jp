@@ -16,6 +16,7 @@ import * as Y from 'yjs';
 export type SharedObject = {
   chat: {
     messages: any[];
+    files?: { [name: string]: string };
   };
 };
 
@@ -128,10 +129,10 @@ export class NSChatDocModel implements DocumentRegistry.IModel {
   /**
    * Shared object chat
    */
-  get chat(): { messages: any[] } {
+  get chat(): { messages: any[] } | null {
     return this.sharedModel.get('chat');
   }
-  set chat(v: { messages: any[] }) {
+  set chat(v: { messages: any[] } | null) {
     this.sharedModel.set('chat', v);
   }
 
@@ -201,7 +202,7 @@ export class NSChatDocModel implements DocumentRegistry.IModel {
         obj = JSON.parse(data);
     }
     catch (e) {
-        obj = { messages: [] };
+        obj = null;
     }
     this.sharedModel.transact(() => {
       this.sharedModel.set('chat', obj);
@@ -373,14 +374,14 @@ export class NSChatDoc extends YDocument<NSChatDocChange> {
    * @param key The key of the object.
    * @returns The content
    */
-  get(key: 'chat'): { messages: any[] };
+  get(key: 'chat'): { messages: any[] } | null;
   get(key: string): any {
     let data: any;
     try {
         data = JSON.parse(this._content.get(key));
     }
     catch (e) {
-        data = { messages: [] };
+        data = null
     }
     // return key === 'position'
     //   ? data
@@ -396,10 +397,10 @@ export class NSChatDoc extends YDocument<NSChatDocChange> {
    * @param key The key of the object.
    * @param value New object.
    */
-  set(key: 'chat', value: { messages: any[] }): void;
-  set(key: string, value: string | PartialJSONObject): void {
+  set(key: 'chat', value: { messages: any[] } | null): void;
+  set(key: string, value: string | PartialJSONObject | null): void {
     // this._content.set(key, key === 'position' ? JSON.stringify(value) : value);
-    this._content.set(key, JSON.stringify(value));
+    this._content.set(key, value ? JSON.stringify(value) : null);
   }
 
   /**

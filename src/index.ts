@@ -9,6 +9,7 @@ import NeurosiftChatWidgetContainer from './NeurosiftChatWidget';
 import { WidgetTracker } from '@jupyterlab/apputils';
 import { NSChatDocWidget } from './widget';
 import { NSChatWidgetFactory, NSChatDocModelFactory } from './factory';
+import { ISessionContextDialogs } from '@jupyterlab/apputils';
 
 /**
  * The name of the factory that creates editor widgets.
@@ -22,12 +23,13 @@ const plugin: JupyterFrontEndPlugin<void> = {
   id: 'neurosift-jp:plugin',
   description: 'Neurosift Jupyter extension',
   autoStart: true,
-  requires: [INotebookTracker, ICommandPalette, ILayoutRestorer],
+  requires: [INotebookTracker, ICommandPalette, ILayoutRestorer, ISessionContextDialogs],
   activate: (
     app: JupyterFrontEnd,
     tracker: INotebookTracker,
     palette: ICommandPalette,
-    restorer: ILayoutRestorer
+    restorer: ILayoutRestorer,
+    sessionDialogs: ISessionContextDialogs
   ) => {
     console.log('JupyterLab extension neurosift-jp is activated!');
 
@@ -81,8 +83,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
       modelName: 'nschat-model',
       fileTypes: ['nschat'],
       defaultFor: ['nschat'],
-      autoStartDefault: false,
-      preferKernel: false,
+      autoStartDefault: true,
+      preferKernel: true,
       canStartKernel: true
     });
 
