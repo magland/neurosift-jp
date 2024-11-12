@@ -1,24 +1,9 @@
-import { YDocument, DocumentChange } from '@jupyter/ydoc';
-
 import { IChangedArgs } from '@jupyterlab/coreutils';
-
 import { DocumentRegistry } from '@jupyterlab/docregistry';
-
-import { JSONValue, PartialJSONObject, PartialJSONValue } from '@lumino/coreutils';
-
+import { PartialJSONValue } from '@lumino/coreutils';
 import { ISignal, Signal } from '@lumino/signaling';
-
-import * as Y from 'yjs';
-
-/**
- * Document structure
- */
-export type SharedObject = {
-  chat: {
-    messages: any[];
-    files?: { [name: string]: string };
-  };
-};
+import { NSChatDoc } from './NSChatDoc';
+import { NSChatDocChange } from './types';
 
 /**
  * DocumentModel: this Model represents the content of the file
@@ -129,10 +114,10 @@ export class NSChatDocModel implements DocumentRegistry.IModel {
   /**
    * Shared object chat
    */
-  get chat(): { messages: any[] } | null {
+  get chat(): { messages: any[], files?: { [name: string]: string } } | null {
     return this.sharedModel.get('chat');
   }
-  set chat(v: { messages: any[] } | null) {
+  set chat(v: { messages: any[], files?: { [name: string]: string } } | null) {
     this.sharedModel.set('chat', v);
   }
 
@@ -307,117 +292,4 @@ export class NSChatDocModel implements DocumentRegistry.IModel {
   private _contentChanged = new Signal<this, void>(this);
   private _collaborationEnabled: boolean;
   private _stateChanged = new Signal<this, IChangedArgs<any>>(this);
-}
-
-/**
- * Type representing the changes on the sharedModel.
- *
- * NOTE: Yjs automatically syncs the documents of the different clients
- * and triggers an event to notify that the content changed. You can
- * listen to this changes and propagate them to the widget so you don't
- * need to update all the data in the widget, you can only update the data
- * that changed.
- *
- * This type represents the different changes that may happen and ready to use
- * for the widget.
- */
-export type NSChatDocChange = {
-  chatChange?: { messages: any[] };
-} & DocumentChange;
-
-/**
- * SharedModel, stores and shares the content between clients.
- */
-export class NSChatDoc extends YDocument<NSChatDocChange> {
-  constructor() {
-    super();
-    // Creating a new shared object and listen to its changes
-    this._content = this.ydoc.getMap('content');
-    this._content.observe(this._contentObserver);
-  }
-
-  readonly version: string = '1.0.0';
-
-  // added by jfm
-  getSource(): JSONValue | string {
-    return this._content.toJSON();
-  }
-
-  // added by jfm
-  setSource(value: JSONValue | string): void {
-    throw Error('not implemented');
-  }
-
-  /**
-   * Dispose of the resources.
-   */
-  dispose(): void {
-    if (this.isDisposed) {
-      return;
-    }
-    this._content.unobserve(this._contentObserver);
-    super.dispose();
-  }
-
-  /**
-   * Static method to create instances on the sharedModel
-   *
-   * @returns The sharedModel instance
-   */
-  static create(): NSChatDoc {
-    return new NSChatDoc();
-  }
-
-  /**
-   * Returns an the requested object.
-   *
-   * @param key The key of the object.
-   * @returns The content
-   */
-  get(key: 'chat'): { messages: any[] } | null;
-  get(key: string): any {
-    let data: any;
-    try {
-        data = JSON.parse(this._content.get(key));
-    }
-    catch (e) {
-        data = null
-    }
-    // return key === 'position'
-    //   ? data
-    //     ? JSON.parse(data)
-    //     : { x: 0, y: 0 }
-    //   : data ?? '';
-    return data;
-  }
-
-  /**
-   * Adds new data.
-   *
-   * @param key The key of the object.
-   * @param value New object.
-   */
-  set(key: 'chat', value: { messages: any[] } | null): void;
-  set(key: string, value: string | PartialJSONObject | null): void {
-    // this._content.set(key, key === 'position' ? JSON.stringify(value) : value);
-    this._content.set(key, value ? JSON.stringify(value) : null);
-  }
-
-  /**
-   * Handle a change.
-   *
-   * @param event Model event
-   */
-  private _contentObserver = (event: Y.YMapEvent<any>): void => {
-    const changes: NSChatDocChange = {};
-
-    // Checks which object changed and propagates them.
-    if (event.keysChanged.has('chat')) {
-      changes.chatChange = JSON.parse(this._content.get('chat'));
-    }
-
-    this._changed.emit(changes);
-  };
-
-  private _content: Y.Map<any>;
 }

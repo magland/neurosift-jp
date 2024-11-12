@@ -2,9 +2,10 @@ import { ABCWidgetFactory, DocumentRegistry } from '@jupyterlab/docregistry';
 
 import { Contents } from '@jupyterlab/services';
 
-import { NSChatDocWidget, NSChatPanel } from './widget';
-
-import { NSChatDoc, NSChatDocModel } from './model';
+import { NSChatDocWidget } from './widgets/NSChatDocWidget';
+import { NSChatPanel } from './widgets/NSChatPanel';
+import { NSChatDocModel } from './models/NSChatDocModel';
+import { NSChatDoc } from './models/NSChatDoc';
 
 /**
  * A widget factory to create new instances of NSChatDocWidget.

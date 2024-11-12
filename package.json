@@ -17,9 +17,9 @@
         "email": "jmagland@flatironinstitute.org"
     },
     "files": [
-        "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
+        "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf,css}",
         "style/**/*.{css,js,eot,gif,html,jpg,json,png,svg,woff2,ttf}",
-        "src/**/*.{ts,tsx}"
+        "src/**/*.{ts,tsx,css}"
     ],
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
@@ -29,7 +29,7 @@
         "url": "https://github.com/magland/neurosift-jp.git"
     },
     "scripts": {
-        "build": "jlpm build:lib && jlpm build:labextension:dev",
+        "build": "jlpm build:lib && cp src/neurosift-lib/timeseries/component-time-scroll-view-2/ToolbarStyles.css lib/neurosift-lib/timeseries/component-time-scroll-view-2/ToolbarStyles.css && jlpm build:labextension:dev",
         "build:prod": "jlpm clean && jlpm build:lib:prod && jlpm build:labextension",
         "build:labextension": "jupyter labextension build .",
         "build:labextension:dev": "jupyter labextension build --development True .",
@@ -62,6 +62,7 @@
         "@fortawesome/fontawesome-svg-core": "^6.6.0",
         "@fortawesome/free-solid-svg-icons": "^6.6.0",
         "@fortawesome/react-fontawesome": "^0.2.2",
+        "@jupyter-widgets/base": "^6.0.10",
         "@jupyterlab/application": "^4.0.0",
         "@jupyterlab/launcher": "^4.3.0",
         "@jupyterlab/notebook": "^4.3.0",
@@ -146,5 +147,15 @@
         "experimentalTernaries": false,
         "bracketSameLine": false,
         "arrowParens": "always"
+    },
+    "jupyterlab": {
+        "extension": "lib/index",
+        "outputDir": "neurosift_jp/labextension/",
+        "sharedPackages": {
+            "@jupyter-widgets/base": {
+                "bundled": false,
+                "singleton": true
+            }
+        }
     }
 }

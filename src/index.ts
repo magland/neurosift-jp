@@ -7,9 +7,12 @@ import { ICommandPalette, MainAreaWidget } from '@jupyterlab/apputils';
 import { INotebookTracker } from '@jupyterlab/notebook';
 import NeurosiftChatWidgetContainer from './NeurosiftChatWidget';
 import { WidgetTracker } from '@jupyterlab/apputils';
-import { NSChatDocWidget } from './widget';
-import { NSChatWidgetFactory, NSChatDocModelFactory } from './factory';
-import { ISessionContextDialogs } from '@jupyterlab/apputils';
+import { NSChatDocWidget } from './NSChat/widgets/NSChatDocWidget';
+import { NSChatWidgetFactory, NSChatDocModelFactory } from './NSChat/factory';
+import { IJupyterWidgetRegistry } from '@jupyter-widgets/base';
+import { MODULE_NAME, MODULE_VERSION } from './TestWidget/version';
+import * as exampleWidgetExports from './TestWidget/widget';
+import * as rasterPlotExports from './widgets/RasterPlot';
 
 /**
  * The name of the factory that creates editor widgets.
@@ -23,15 +26,21 @@ const plugin: JupyterFrontEndPlugin<void> = {
   id: 'neurosift-jp:plugin',
   description: 'Neurosift Jupyter extension',
   autoStart: true,
-  requires: [INotebookTracker, ICommandPalette, ILayoutRestorer, ISessionContextDialogs],
+  requires: [INotebookTracker, ICommandPalette, ILayoutRestorer, IJupyterWidgetRegistry],
   activate: (
     app: JupyterFrontEnd,
     tracker: INotebookTracker,
     palette: ICommandPalette,
     restorer: ILayoutRestorer,
-    sessionDialogs: ISessionContextDialogs
+    registry: IJupyterWidgetRegistry
   ) => {
     console.log('JupyterLab extension neurosift-jp is activated!');
+
+    registry.registerWidget({
+      name: MODULE_NAME,
+      version: MODULE_VERSION,
+      exports: {...exampleWidgetExports, ...rasterPlotExports}
+    });
 
     // Namespace for the tracker
     const namespace = 'documents-nschat';

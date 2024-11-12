@@ -1,50 +1,10 @@
-// Copyright 2023 Project Jupyter Contributors
-//
-// Original version has copyright 2018 Wolf Vollprecht and is licensed
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-import { DocumentRegistry, DocumentWidget } from '@jupyterlab/docregistry';
-
+import { DocumentRegistry } from '@jupyterlab/docregistry';
 import { Widget } from '@lumino/widgets';
-
 import { Signal } from '@lumino/signaling';
-
-import { NSChatDocModel } from './model';
-import { NeurosiftChatWidget } from './NeurosiftChatWidget';
-
 import { ReactWidget } from "@jupyterlab/apputils";
-import { ChatAction, chatReducer, emptyChat } from './neurosift-lib/pages/ChatPage/Chat';
-
-/**
- * DocumentWidget: widget that represents the view or editor for a file type.
- */
-export class NSChatDocWidget extends DocumentWidget<
-NSChatPanel,
-NSChatDocModel
-> {
-  constructor(options: DocumentWidget.IOptions<NSChatPanel, NSChatDocModel>) {
-    super(options);
-  }
-
-  /**
-   * Dispose of the resources held by the widget.
-   */
-  dispose(): void {
-    this.content.dispose();
-    super.dispose();
-  }
-}
+import { NSChatDocModel } from '../../NSChat/models/NSChatDocModel';
+import { NeurosiftChatWidget } from '../../NeurosiftChatWidget';
+import { ChatAction, chatReducer, emptyChat } from '../../neurosift-lib/pages/ChatPage/Chat';
 
 /**
  * Widget that contains the main view of the DocumentWidget.
@@ -54,6 +14,7 @@ export class NSChatPanel extends ReactWidget {
   height = 500;
   kernel: any | undefined;
   chatDispatch: (action: ChatAction) => void;
+
   /**
    * Construct a `NSChatPanel`.
    *
@@ -89,7 +50,6 @@ export class NSChatPanel extends ReactWidget {
     }
 
     this._onContentChanged();
-    // this.node.appendChild(this._cube);
   }
 
   render(): JSX.Element {
@@ -134,7 +94,6 @@ export class NSChatPanel extends ReactWidget {
   private _onContentChanged = (): void => {
     // this._cube.style.left = this._model.position.x + 'px';
     // this._cube.style.top = this._model.position.y + 'px';
-
     // this._cube.innerText = this._model.content;
   };
 
