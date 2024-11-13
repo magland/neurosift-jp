@@ -10,6 +10,13 @@ export type PlotlyContent = {
   layout: any;
 };
 
+export type NeurosiftFigureContent = {
+  nwb_url: string;
+  item_path: string;
+  view_plugin_name?: string;
+  height?: number;
+};
+
 export type PythonSessionOutputItem =
   | {
       type: "stdout" | "stderr";
@@ -24,6 +31,11 @@ export type PythonSessionOutputItem =
       type: "figure";
       format: "plotly";
       content: PlotlyContent;
+    }
+  | {
+      type: "figure";
+      format: "neurosift_figure";
+      content: NeurosiftFigureContent;
     };
 
 class PythonSessionClient {
@@ -109,6 +121,17 @@ class PythonSessionClient {
             content: msg.content.data[
               "application/vnd.plotly.v1+json"
             ] as PlotlyContent,
+          };
+          this._addOutputItem(item);
+        } else if (
+          "application/vnd.neurosift-figure+json" in msg.content.data
+        ) {
+          const item: PythonSessionOutputItem = {
+            type: "figure",
+            format: "neurosift_figure",
+            content: msg.content.data[
+              "application/vnd.neurosift-figure+json"
+            ] as NeurosiftFigureContent,
           };
           this._addOutputItem(item);
         }

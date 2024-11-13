@@ -8,7 +8,28 @@
             "problemMatcher": [],
             "presentation": {
                 "reveal": "always",
-                "panel": "new"
+                "panel": "new",
+                "close": true
+            },
+            "group": {
+                "kind": "none"
+            }
+        },
+        {
+            "label": "Release Package",
+            "type": "shell",
+            "command": "./scripts/release.sh",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^Error:\\s+(.*)$",
+                    "message": 1
+                }
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "focus": true,
+                "showReuseMessage": false
             },
             "group": {
                 "kind": "none"
