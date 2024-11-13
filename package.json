@@ -29,7 +29,7 @@
         "url": "https://github.com/magland/neurosift-jp.git"
     },
     "scripts": {
-        "build": "jlpm build:lib && cp src/neurosift-lib/timeseries/component-time-scroll-view-2/ToolbarStyles.css lib/neurosift-lib/timeseries/component-time-scroll-view-2/ToolbarStyles.css && jlpm build:labextension:dev",
+        "build": "jlpm build:lib && find src -name '*.css' -exec sh -c 'mkdir -p lib/$(dirname {}|cut -c5-) && cp {} lib/$(dirname {}|cut -c5-)/$(basename {})' \\; && jlpm build:labextension:dev",
         "build:prod": "jlpm clean && jlpm build:lib:prod && jlpm build:labextension",
         "build:labextension": "jupyter labextension build .",
         "build:labextension:dev": "jupyter labextension build --development True .",
@@ -133,7 +133,13 @@
     },
     "jupyterlab": {
         "extension": true,
-        "outputDir": "neurosift_jp/labextension"
+        "outputDir": "neurosift_jp/labextension",
+        "sharedPackages": {
+            "@jupyter-widgets/base": {
+                "bundled": false,
+                "singleton": true
+            }
+        }
     },
     "eslintIgnore": [
         "node_modules",
@@ -147,15 +153,5 @@
         "experimentalTernaries": false,
         "bracketSameLine": false,
         "arrowParens": "always"
-    },
-    "jupyterlab": {
-        "extension": "lib/index",
-        "outputDir": "neurosift_jp/labextension/",
-        "sharedPackages": {
-            "@jupyter-widgets/base": {
-                "bundled": false,
-                "singleton": true
-            }
-        }
     }
 }

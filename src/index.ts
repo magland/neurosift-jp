@@ -1,18 +1,19 @@
+import { IJupyterWidgetRegistry } from '@jupyter-widgets/base';
 import {
   ILayoutRestorer,
   JupyterFrontEnd,
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
-import { ICommandPalette, MainAreaWidget } from '@jupyterlab/apputils';
+import { ICommandPalette, MainAreaWidget, WidgetTracker } from '@jupyterlab/apputils';
 import { INotebookTracker } from '@jupyterlab/notebook';
+import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
+import { IRenderMime } from '@jupyterlab/rendermime-interfaces';
+import NeurosiftFigureRenderer from './NeurosiftFigureRenderer';
 import NeurosiftChatWidgetContainer from './NeurosiftChatWidget';
-import { WidgetTracker } from '@jupyterlab/apputils';
+import { NSChatDocModelFactory, NSChatWidgetFactory } from './NSChat/factory';
 import { NSChatDocWidget } from './NSChat/widgets/NSChatDocWidget';
-import { NSChatWidgetFactory, NSChatDocModelFactory } from './NSChat/factory';
-import { IJupyterWidgetRegistry } from '@jupyter-widgets/base';
 import { MODULE_NAME, MODULE_VERSION } from './TestWidget/version';
 import * as exampleWidgetExports from './TestWidget/widget';
-import * as rasterPlotExports from './widgets/RasterPlot';
 
 /**
  * The name of the factory that creates editor widgets.
@@ -26,20 +27,23 @@ const plugin: JupyterFrontEndPlugin<void> = {
   id: 'neurosift-jp:plugin',
   description: 'Neurosift Jupyter extension',
   autoStart: true,
-  requires: [INotebookTracker, ICommandPalette, ILayoutRestorer, IJupyterWidgetRegistry],
+  requires: [INotebookTracker, ICommandPalette, ILayoutRestorer, IJupyterWidgetRegistry, IRenderMimeRegistry],
   activate: (
     app: JupyterFrontEnd,
     tracker: INotebookTracker,
     palette: ICommandPalette,
     restorer: ILayoutRestorer,
-    registry: IJupyterWidgetRegistry
+    registry: IJupyterWidgetRegistry,
+    rendermime: IRenderMimeRegistry
   ) => {
     console.log('JupyterLab extension neurosift-jp is activated!');
+
+    rendermime.addFactory(neurosiftFigureRendererFactory);
 
     registry.registerWidget({
       name: MODULE_NAME,
       version: MODULE_VERSION,
-      exports: {...exampleWidgetExports, ...rasterPlotExports}
+      exports: {...exampleWidgetExports}
     });
 
     // Namespace for the tracker
@@ -150,5 +154,11 @@ const plugin: JupyterFrontEndPlugin<void> = {
     }
   }
 };
+
+const neurosiftFigureRendererFactory: IRenderMime.IRendererFactory = {
+  safe: true,
+  mimeTypes: ['application/vnd.neurosift-figure+json'],
+  createRenderer: options => new NeurosiftFigureRenderer()
+}
 
 export default plugin;

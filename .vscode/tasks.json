@@ -1,0 +1,18 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Compare neurosift-lib directories",
+            "type": "shell",
+            "command": "meld src/neurosift-lib ../neurosift/gui/src/neurosift-lib",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "group": {
+                "kind": "none"
+            }
+        }
+    ]
+}
